@@ -1,0 +1,42 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NewsletterSignup from '../components/NewsletterSignup.astro';
+import PostList from '../components/PostList.astro';
+import { getPublishedPosts } from '../lib/posts';
+
+const posts = (await getPublishedPosts()).slice(0, 5);
+---
+
+<BaseLayout>
+  <section class="intro">
+    <h1>David Nel</h1>
+    <p class="lede">
+      I am a Computer Engineering graduate based in South Africa. I write about programming,
+      technical side projects, and the ideas, notes, and useful details I come across while
+      learning.
+    </p>
+    <p>
+      I learn best through projects: small, concrete builds that are interesting enough to finish
+      and difficult enough to stretch my design and problem-solving skills. This site is my way of
+      learning in public, keeping track of what I figure out, and hopefully finding others who care
+      about honing their craft, learning new things, and enjoying the process. I hope you find
+      something here that is useful in your own learning journey.
+    </p>
+  </section>
+
+  <section class="link-panel" aria-label="Site sections">
+    <a href="/blog">Read the blog</a>
+    <a href="/newsletter">Subscribe</a>
+    <a href="/rss.xml">RSS feed</a>
+  </section>
+
+  <section class="section-block">
+    <div class="section-heading">
+      <h2>Latest Posts</h2>
+      <a href="/blog">All posts</a>
+    </div>
+    <PostList posts={posts} />
+  </section>
+
+  <NewsletterSignup compact />
+</BaseLayout>

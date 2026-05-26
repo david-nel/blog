@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostList from '../../components/PostList.astro';
+import { getAllSeries, getPublishedPosts, slugify, sortSeriesPosts } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return getAllSeries(posts).map((series) => ({
+    params: { series: slugify(series) },
+    props: { series },
+  }));
+}
+
+const { series } = Astro.props;
+const posts = sortSeriesPosts((await getPublishedPosts()).filter((post) => post.data.series === series));
+---
+
+<BaseLayout title={series}>
+  <section class="page-heading">
+    <h1>{series}</h1>
+  </section>
+  <PostList posts={posts} />
+</BaseLayout>

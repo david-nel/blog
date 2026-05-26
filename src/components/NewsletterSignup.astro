@@ -1,0 +1,25 @@
+---
+interface Props {
+  compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
+---
+
+<section class:list={['newsletter', { compact }]}>
+  <div>
+    <h2>Newsletter</h2>
+    <p>
+      A monthly digest of new posts on programming and technical side projects, plus a small
+      selection of useful articles, projects, and ideas I found worth sharing.
+    </p>
+  </div>
+  <div class="beehiiv-embed">
+    <script
+      is:inline
+      async
+      src="https://subscribe-forms.beehiiv.com/v3/loader.js"
+      data-beehiiv-form="2accc7af-376d-4acd-8d3a-0aab99d720c0"
+    ></script>
+  </div>
+</section>

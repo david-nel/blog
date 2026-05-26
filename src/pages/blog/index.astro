@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostList from '../../components/PostList.astro';
+import { getAllSeries, getAllTags, getPublishedPosts, slugify } from '../../lib/posts';
+
+const posts = await getPublishedPosts();
+const tags = getAllTags(posts);
+const series = getAllSeries(posts);
+---
+
+<BaseLayout title="Blog" description="Programming notes, technical side projects, and learning logs by David Nel.">
+  <section class="page-heading">
+    <h1>Blog</h1>
+    <p>
+      The latest posts on programming, technical side projects, tools, infrastructure, and the
+      lessons that come from building things carefully.
+    </p>
+  </section>
+
+  <section class="taxonomy">
+    <div>
+      <h2>Tags</h2>
+      <p>{tags.map((tag) => <a href={`/tags/${slugify(tag)}/`}>{tag}</a>)}</p>
+    </div>
+    {
+      series.length > 0 && (
+        <div>
+          <h2>Series</h2>
+          <p>{series.map((name) => <a href={`/series/${slugify(name)}/`}>{name}</a>)}</p>
+        </div>
+      )
+    }
+  </section>
+
+  <PostList posts={posts} />
+</BaseLayout>

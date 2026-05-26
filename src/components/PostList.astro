@@ -1,0 +1,29 @@
+---
+import { formatDate, type BlogPost } from '../lib/posts';
+
+interface Props {
+  posts: BlogPost[];
+}
+
+const { posts } = Astro.props;
+---
+
+<ol class="post-list">
+  {
+    posts.map((post) => (
+      <li>
+        <article>
+          <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+          <h2><a href={`/blog/${post.id}/`}>{post.data.title}</a></h2>
+          <p>{post.data.description}</p>
+          <div class="meta-row">
+            {post.data.series && <a href={`/series/${post.data.series.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}/`}>Series: {post.data.series}</a>}
+            {post.data.tags.map((tag) => (
+              <a href={`/tags/${tag.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}/`}>#{tag}</a>
+            ))}
+          </div>
+        </article>
+      </li>
+    ))
+  }
+</ol>

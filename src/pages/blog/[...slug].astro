@@ -1,0 +1,72 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import NewsletterSignup from '../../components/NewsletterSignup.astro';
+import { formatDate, getPublishedPosts, slugify, sortSeriesPosts } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const allPosts = await getPublishedPosts();
+const seriesPosts = post.data.series
+  ? sortSeriesPosts(allPosts.filter((entry) => entry.data.series === post.data.series))
+  : [];
+const currentSeriesIndex = seriesPosts.findIndex((entry) => entry.id === post.id);
+---
+
+<BaseLayout title={post.data.title} description={post.data.description}>
+  <article class="post">
+    <header class="post-header">
+      <h1>{post.data.title}</h1>
+      <p class="post-date">
+        <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+      </p>
+      <p>{post.data.description}</p>
+      <div class="meta-row">
+        {post.data.tags.map((tag) => <a href={`/tags/${slugify(tag)}/`}>#{tag}</a>)}
+      </div>
+    </header>
+
+    {
+      post.data.heroImage && (
+        <figure class="hero-figure">
+          <img src={post.data.heroImage.src} alt={post.data.heroAlt ?? ''} />
+          {post.data.heroAlt && <figcaption>{post.data.heroAlt}</figcaption>}
+        </figure>
+      )
+    }
+
+    {
+      post.data.series && (
+        <aside class="series-box">
+          <strong>{post.data.series}</strong>
+          <span>Part {currentSeriesIndex + 1} of {seriesPosts.length}</span>
+          <ol>
+            {seriesPosts.map((entry) => (
+              <li aria-current={entry.id === post.id ? 'page' : undefined}>
+                <a href={`/blog/${entry.id}/`}>{entry.data.title}</a>
+              </li>
+            ))}
+          </ol>
+        </aside>
+      )
+    }
+
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+
+  <section class="comments">
+    <h2>Discussion</h2>
+    <p>
+      Comments will use Giscus once the GitHub repository and discussion category are configured.
+    </p>
+  </section>
+
+  <NewsletterSignup compact />
+</BaseLayout>
