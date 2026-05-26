@@ -3,7 +3,7 @@ title: "Starting the Log"
 description: "A short note on what this blog is for and how I want to use it."
 pubDate: 2026-05-26
 tags: ["meta", "craft"]
-draft: true
+draft: false
 ---
 
 This site is a place for practical notes from programming, technical side projects, and the slow work of improving at a craft.
