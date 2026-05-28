@@ -7,6 +7,7 @@ Personal technical blog built with Astro.
 ```bash
 npm install
 npm run dev
+npm run new:post my-post-title
 npm run build
 npm run preview
 ```
@@ -21,8 +22,6 @@ title: "Post Title"
 description: "A short summary used on listing pages and RSS."
 pubDate: 2026-05-26
 tags: ["programming", "projects"]
-heroImage: "./images/example.jpg"
-heroAlt: "A useful description of the hero image."
 series: "Optional Series Name"
 seriesOrder: 1
 draft: false

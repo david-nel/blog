@@ -1,0 +1,51 @@
+---
+import { formatDate, type BlogPost } from '../lib/posts';
+
+interface Props {
+  posts: BlogPost[];
+  currentPostId: string;
+  seriesName: string;
+  seriesDescription?: string;
+}
+
+const { posts, currentPostId, seriesName, seriesDescription } = Astro.props;
+const currentIndex = posts.findIndex((post) => post.id === currentPostId);
+---
+
+<aside class="series-timeline" aria-labelledby="series-timeline-heading">
+  <div class="series-timeline-header">
+    <p class="kicker">Series</p>
+    <h2 id="series-timeline-heading">{seriesName}</h2>
+    {seriesDescription && <p class="series-timeline-description">{seriesDescription}</p>}
+    <p>
+      {currentIndex >= 0
+        ? `Part ${currentIndex + 1} of ${posts.length}`
+        : `${posts.length} posts`}
+    </p>
+  </div>
+
+  <ol>
+    {
+      posts.map((post, index) => {
+        const isCurrent = post.id === currentPostId;
+        const state = index < currentIndex ? 'complete' : isCurrent ? 'current' : 'upcoming';
+
+        return (
+          <li data-state={state} aria-current={isCurrent ? 'step' : undefined}>
+            <span class="series-timeline-marker" aria-hidden="true"></span>
+            <a class="series-timeline-link" href={`/blog/${post.id}/`}>
+              <span class="series-timeline-meta">
+                Part {index + 1}
+                {' | '}
+                <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+                {isCurrent && ' | Current'}
+              </span>
+              <span class="series-timeline-title">{post.data.title}</span>
+              <p>{post.data.description}</p>
+            </a>
+          </li>
+        );
+      })
+    }
+  </ol>
+</aside>

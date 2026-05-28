@@ -4,6 +4,7 @@
   "description": "David Nel's personal technical blog.",
   "scripts": {
     "dev": "astro dev",
+    "new:post": "node scripts/new-post.mjs",
     "build": "astro check && astro build",
     "preview": "astro preview"
   },

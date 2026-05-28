@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
+import SeriesTimeline from '../../components/SeriesTimeline.astro';
 import { formatDate, getPublishedPosts, slugify, sortSeriesPosts } from '../../lib/posts';
 
 export async function getStaticPaths() {
@@ -16,14 +17,30 @@ const seriesPosts = post.data.series
   ? sortSeriesPosts(allPosts.filter((entry) => entry.data.series === post.data.series))
   : [];
 const currentSeriesIndex = seriesPosts.findIndex((entry) => entry.id === post.id);
+const previousSeriesPost = currentSeriesIndex > 0 ? seriesPosts[currentSeriesIndex - 1] : undefined;
+const nextSeriesPost =
+  currentSeriesIndex >= 0 && currentSeriesIndex < seriesPosts.length - 1
+    ? seriesPosts[currentSeriesIndex + 1]
+    : undefined;
+const seriesDescription = seriesPosts.find((entry) => entry.data.seriesDescription)?.data.seriesDescription;
 ---
 
 <BaseLayout title={post.data.title} description={post.data.description}>
   <article class="post">
     <header class="post-header">
       <h1>{post.data.title}</h1>
-      <p class="post-date">
-        <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+      <p class="post-date post-dates">
+        <span>
+          Published <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+        </span>
+        {
+          post.data.updatedDate && (
+            <span>
+              <span aria-hidden="true">|</span>
+              Last updated <time datetime={post.data.updatedDate.toISOString()}>{formatDate(post.data.updatedDate)}</time>
+            </span>
+          )
+        }
       </p>
       <p>{post.data.description}</p>
       <div class="meta-row">
@@ -32,33 +49,40 @@ const currentSeriesIndex = seriesPosts.findIndex((entry) => entry.id === post.id
     </header>
 
     {
-      post.data.heroImage && (
-        <figure class="hero-figure">
-          <img src={post.data.heroImage.src} alt={post.data.heroAlt ?? ''} />
-          {post.data.heroAlt && <figcaption>{post.data.heroAlt}</figcaption>}
-        </figure>
-      )
-    }
-
-    {
       post.data.series && (
-        <aside class="series-box">
-          <strong>{post.data.series}</strong>
-          <span>Part {currentSeriesIndex + 1} of {seriesPosts.length}</span>
-          <ol>
-            {seriesPosts.map((entry) => (
-              <li aria-current={entry.id === post.id ? 'page' : undefined}>
-                <a href={`/blog/${entry.id}/`}>{entry.data.title}</a>
-              </li>
-            ))}
-          </ol>
-        </aside>
+        <SeriesTimeline
+          posts={seriesPosts}
+          currentPostId={post.id}
+          seriesName={post.data.series}
+          seriesDescription={seriesDescription}
+        />
       )
     }
 
     <div class="prose">
       <Content />
     </div>
+
+    {
+      post.data.series && (previousSeriesPost || nextSeriesPost) && (
+        <nav class="series-nav" aria-label={`${post.data.series} series navigation`}>
+          {previousSeriesPost ? (
+            <a class="series-nav-link" href={`/blog/${previousSeriesPost.id}/`} rel="prev">
+              <span>Previous in series</span>
+              <strong>{previousSeriesPost.data.title}</strong>
+            </a>
+          ) : (
+            <span></span>
+          )}
+          {nextSeriesPost && (
+            <a class="series-nav-link next" href={`/blog/${nextSeriesPost.id}/`} rel="next">
+              <span>Next in series</span>
+              <strong>{nextSeriesPost.data.title}</strong>
+            </a>
+          )}
+        </nav>
+      )
+    }
   </article>
 
   <NewsletterSignup compact />
